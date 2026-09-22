@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Automation Control Center | Live Cloud Monitor</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="brand-wrapper">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24">
+          <path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.75 12 4.75 12 4.75s-6 0-7.68.54a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 1.88 12a28.4 28.4 0 0 0 .54 4.81 2.7 2.7 0 0 0 1.9 1.9c1.68.54 7.68.54 7.68.54s6 0 7.68-.54a2.7 2.7 0 0 0 1.9-1.9c.36-1.57.54-3.19.54-4.81a28.4 28.4 0 0 0-.54-4.81zM9.75 15.02V8.98L15.5 12l-5.75 3.02z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">YT AUTOMATION CONTROL CENTER</div>
+        <div class="brand-subtitle">Pure Cloud Autonomous Engine • Dual Channel Monitor</div>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <div class="cloud-status-badge">
+        <span class="pulse-dot"></span>
+        <span id="globalCloudStatus">Cloud Engine Ready</span>
+      </div>
+
+      <button id="refreshBtn" class="icon-btn" title="Refresh Live Data">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        <span>Refresh</span>
+      </button>
+
+      <button id="settingsBtn" class="icon-btn" title="API Settings">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+          <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+    <div class="hero-banner">
+      <div>
+        <h1 class="hero-title">Daily Production & Cloud Status</h1>
+        <p class="hero-description">Monitor video generation, YouTube publication status, and trigger daily cloud rendering with a single click.</p>
+      </div>
+      <div class="last-refreshed-time" id="lastUpdatedText">Updated: Just now</div>
+    </div>
+
+    <!-- Dual Channel Operations Grid -->
+    <div class="channels-grid">
+
+      <!-- ================= CHANNEL 1: BLACK PEARL ================= -->
+      <section class="channel-card ch1-card">
+        <div class="card-header">
+          <div>
+            <div class="channel-tag ch1-tag">Channel 1</div>
+            <h2 class="channel-name">Black Pearl</h2>
+            <div class="channel-theme">🔮 Mystery / Dark Realities / Unsolved</div>
+          </div>
+          <div id="ch1StatusPill" class="status-pill idle">Checking...</div>
+        </div>
+
+        <!-- Video Creation & Publication Details -->
+        <div class="video-preview-box">
+          <div class="preview-label">Latest Video Generation & YouTube Status</div>
+          <div id="ch1VideoTitle" class="video-title">Loading latest creation...</div>
+          
+          <div class="video-meta-row">
+            <div class="video-meta-item">
+              <span class="meta-icon">🎬</span>
+              <span id="ch1CreationStatus">Status: Checking</span>
+            </div>
+            <div class="video-meta-item">
+              <span class="meta-icon">📅</span>
+              <span id="ch1PublishDate">Date: --</span>
+            </div>
+            <div class="video-meta-item">
+              <span class="meta-icon">🎨</span>
+              <span>20 Scenes • 1080x1920 Imagen 3</span>
+            </div>
+          </div>
+
+          <a id="ch1YtLink" href="#" target="_blank" class="yt-link-btn" style="display: none;">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.75 12 4.75 12 4.75s-6 0-7.68.54a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 1.88 12a28.4 28.4 0 0 0 .54 4.81 2.7 2.7 0 0 0 1.9 1.9c1.68.54 7.68.54 7.68.54s6 0 7.68-.54a2.7 2.7 0 0 0 1.9-1.9c.36-1.57.54-3.19.54-4.81a28.4 28.4 0 0 0-.54-4.81zM9.75 15.02V8.98L15.5 12l-5.75 3.02z"/>
+            </svg>
+            <span>Watch Video on YouTube</span>
+          </a>
+        </div>
+
+        <!-- Action Trigger Section -->
+        <div class="action-box">
+          <button id="triggerCh1Btn" class="trigger-btn ch1-btn">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span id="ch1BtnText">Generate Channel 1 (Black Pearl)</span>
+          </button>
+
+          <!-- Real-Time Pipeline Progress Indicator -->
+          <div class="pipeline-steps" id="ch1Steps">
+            <div class="step-item" data-step="1">1. Story</div>
+            <div class="step-item" data-step="2">2. Audio</div>
+            <div class="step-item" data-step="3">3. Imagen 3</div>
+            <div class="step-item" data-step="4">4. Render</div>
+            <div class="step-item" data-step="5">5. YouTube</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= CHANNEL 2: WONDERPEAK ================= -->
+      <section class="channel-card ch2-card">
+        <div class="card-header">
+          <div>
+            <div class="channel-tag ch2-tag">Channel 2</div>
+            <h2 class="channel-name">WonderPeak</h2>
+            <div class="channel-theme">⚡ Science / Physics / Mind-Blowing Facts</div>
+          </div>
+          <div id="ch2StatusPill" class="status-pill idle">Checking...</div>
+        </div>
+
+        <!-- Video Creation & Publication Details -->
+        <div class="video-preview-box">
+          <div class="preview-label">Latest Video Generation & YouTube Status</div>
+          <div id="ch2VideoTitle" class="video-title">Loading latest creation...</div>
+          
+          <div class="video-meta-row">
+            <div class="video-meta-item">
+              <span class="meta-icon">🎬</span>
+              <span id="ch2CreationStatus">Status: Checking</span>
+            </div>
+            <div class="video-meta-item">
+              <span class="meta-icon">📅</span>
+              <span id="ch2PublishDate">Date: --</span>
+            </div>
+            <div class="video-meta-item">
+              <span class="meta-icon">🎨</span>
+              <span>15-20 Scenes • 1080x1920 Imagen 3</span>
+            </div>
+          </div>
+
+          <a id="ch2YtLink" href="#" target="_blank" class="yt-link-btn" style="display: none;">
+            <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.75 12 4.75 12 4.75s-6 0-7.68.54a2.7 2.7 0 0 0-1.9 1.9A28.4 28.4 0 0 0 1.88 12a28.4 28.4 0 0 0 .54 4.81 2.7 2.7 0 0 0 1.9 1.9c1.68.54 7.68.54 7.68.54s6 0 7.68-.54a2.7 2.7 0 0 0 1.9-1.9c.36-1.57.54-3.19.54-4.81a28.4 28.4 0 0 0-.54-4.81zM9.75 15.02V8.98L15.5 12l-5.75 3.02z"/>
+            </svg>
+            <span>Watch Video on YouTube</span>
+          </a>
+        </div>
+
+        <!-- Action Trigger Section -->
+        <div class="action-box">
+          <button id="triggerCh2Btn" class="trigger-btn ch2-btn">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span id="ch2BtnText">Generate Channel 2 (WonderPeak)</span>
+          </button>
+
+          <!-- Real-Time Pipeline Progress Indicator -->
+          <div class="pipeline-steps" id="ch2Steps">
+            <div class="step-item" data-step="1">1. Story</div>
+            <div class="step-item" data-step="2">2. Audio</div>
+            <div class="step-item" data-step="3">3. Imagen 3</div>
+            <div class="step-item" data-step="4">4. Render</div>
+            <div class="step-item" data-step="5">5. YouTube</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Bottom Monitoring & Health Section -->
+    <div class="bottom-panel">
+
+      <!-- Recent Cloud Executions Table -->
+      <section class="panel-card">
+        <div class="panel-title-row">
+          <div class="panel-title">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>Recent Cloud Execution Logs</span>
+          </div>
+          <span style="font-size: 0.78rem; color: var(--text-dim);" id="runsCount">5 Recent Runs</span>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="runs-table">
+            <thead>
+              <tr>
+                <th>Workflow</th>
+                <th>Status</th>
+                <th>Triggered</th>
+                <th>Duration</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="runsTableBody">
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-dim);">Connecting to GitHub Cloud...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Gemini Cloud Heartbeat Widget -->
+      <section class="panel-card">
+        <div class="panel-title-row">
+          <div class="panel-title">
+            <svg width="18" height="18" fill="none" stroke="#10b981" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+            </svg>
+            <span>Session Heartbeat</span>
+          </div>
+        </div>
+
+        <div class="heartbeat-widget">
+          <div class="heartbeat-meter">
+            <div>
+              <div class="hb-label">Gemini Imagen 3 Auth</div>
+              <div class="hb-value" id="hbStatusText">Healthy</div>
+            </div>
+            <span class="pulse-dot"></span>
+          </div>
+
+          <p class="hb-details">
+            Autonomous 4-hour cloud rolling session. Tokens are refreshed and committed automatically on GitHub.
+          </p>
+
+          <button id="triggerHbBtn" class="btn-sm">
+            ⚡ Trigger Heartbeat Now
+          </button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Settings / Token Modal -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">GitHub API Settings</h3>
+        <button class="close-btn" id="closeSettingsBtn">&times;</button>
+      </div>
+
+      <div class="form-group">
+        <label for="repoInput">GitHub Repository</label>
+        <input type="text" id="repoInput" class="form-input" value="Pratheesh2005/YT-Automation">
+      </div>
+
+      <div class="form-group">
+        <label for="tokenInput">GitHub Personal Access Token (PAT)</label>
+        <input type="password" id="tokenInput" class="form-input" placeholder="ghp_... or gho_...">
+      </div>
+
+      <div class="form-group">
+        <label for="pollIntervalInput">Auto-Refresh Interval (seconds)</label>
+        <input type="number" id="pollIntervalInput" class="form-input" value="15" min="5" max="300">
+      </div>
+
+      <button id="saveSettingsBtn" class="trigger-btn ch1-btn" style="margin-top: 15px;">
+        Save & Reconnect
+      </button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
