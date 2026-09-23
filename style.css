@@ -771,3 +771,147 @@ body {
   outline: none;
   border-color: var(--ch1-color);
 }
+
+/* ==========================================================================
+   Password Protection Overlay
+   ========================================================================== */
+
+.pw-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 9, 14, 0.97);
+  backdrop-filter: blur(24px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.4s ease;
+}
+
+.pw-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pw-modal {
+  background: rgba(13, 18, 29, 0.9);
+  border: 1px solid rgba(0, 210, 255, 0.18);
+  border-radius: 20px;
+  padding: 44px 40px;
+  width: 340px;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(0, 210, 255, 0.12), 0 25px 60px rgba(0, 0, 0, 0.6);
+  animation: pw-appear 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes pw-appear {
+  from { opacity: 0; transform: scale(0.92) translateY(20px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.pw-logo {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  box-shadow: 0 0 20px rgba(0, 210, 255, 0.35);
+}
+
+.pw-logo svg {
+  width: 28px;
+  height: 28px;
+  fill: #fff;
+}
+
+.pw-title {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 6px;
+}
+
+.pw-subtitle {
+  font-size: 0.82rem;
+  color: #8492a6;
+  margin-bottom: 28px;
+}
+
+.pw-input-wrap {
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.pw-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: #f1f5f9;
+  font-size: 1.3rem;
+  letter-spacing: 6px;
+  text-align: center;
+  font-family: var(--font-body);
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.pw-input:focus {
+  outline: none;
+  border-color: var(--ch1-color);
+  box-shadow: 0 0 0 3px rgba(0, 210, 255, 0.12);
+}
+
+.pw-input.shake {
+  animation: pw-shake 0.4s ease;
+  border-color: #ef4444;
+}
+
+@keyframes pw-shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px); }
+  40%       { transform: translateX(8px); }
+  60%       { transform: translateX(-6px); }
+  80%       { transform: translateX(6px); }
+}
+
+.pw-error {
+  font-size: 0.78rem;
+  color: #ef4444;
+  margin-top: 8px;
+  display: none;
+}
+
+.pw-error.visible {
+  display: block;
+}
+
+.pw-btn {
+  width: 100%;
+  padding: 13px;
+  background: var(--ch1-gradient);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.92rem;
+  font-family: var(--font-heading);
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 20px rgba(0, 210, 255, 0.3);
+  letter-spacing: 0.5px;
+}
+
+.pw-btn:hover {
+  box-shadow: 0 6px 28px rgba(0, 210, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.pw-btn:active {
+  transform: translateY(0);
+}
