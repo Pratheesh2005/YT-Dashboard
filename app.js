@@ -6,7 +6,7 @@
 // Default Configuration
 const CONFIG = {
   DEFAULT_REPO: 'Pratheesh2005/YT-Automation',
-  DEFAULT_TOKEN: '',
+  DEFAULT_TOKEN: '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',
   WORKFLOW_CH1: 'daily_shorts.yml',
   WORKFLOW_CH2: 'daily_shorts_wonderpeak.yml',
   WORKFLOW_HEARTBEAT: 'gemini_keepalive.yml',
