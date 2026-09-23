@@ -304,7 +304,12 @@ async function updateWorkflowRuns() {
 
   } catch (err) {
     console.error('Error fetching runs:', err);
-    el.globalStatus.textContent = 'API Connection Error';
+    el.globalStatus.textContent = 'Token Expired — Click ⚙️ to Connect';
+    el.globalStatus.parentElement.style.cursor = 'pointer';
+    el.globalStatus.parentElement.onclick = () => { el.settingsModal.classList.add('open'); };
+    el.globalStatus.parentElement.style.color = '#f87171';
+    el.globalStatus.parentElement.style.background = 'rgba(239, 68, 68, 0.12)';
+    el.globalStatus.parentElement.style.borderColor = 'rgba(239, 68, 68, 0.3)';
   }
 }
 
