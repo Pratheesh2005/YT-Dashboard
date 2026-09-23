@@ -442,6 +442,50 @@ function startPolling() {
 // Event Listeners
 // ==========================================================================
 document.addEventListener('DOMContentLoaded', () => {
+  // ─── Password Protection ────────────────────────────────────────────────
+  const CORRECT_PASSWORD = '1974';
+  const SESSION_KEY      = 'yt_unlocked';
+  const overlay          = document.getElementById('passwordOverlay');
+  const pwInput          = document.getElementById('pwInput');
+  const pwError          = document.getElementById('pwError');
+  const pwSubmitBtn      = document.getElementById('pwSubmitBtn');
+
+  function unlockDashboard() {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    overlay.classList.add('hidden');
+    setTimeout(() => { overlay.style.display = 'none'; }, 420);
+    // Start dashboard only after unlock
+    initDashboard();
+  }
+
+  function tryPassword() {
+    if (pwInput.value === CORRECT_PASSWORD) {
+      unlockDashboard();
+    } else {
+      pwError.classList.add('visible');
+      pwInput.classList.add('shake');
+      pwInput.value = '';
+      setTimeout(() => { pwInput.classList.remove('shake'); }, 420);
+      pwInput.focus();
+    }
+  }
+
+  if (sessionStorage.getItem(SESSION_KEY) === '1') {
+    // Already unlocked this browser session
+    overlay.style.display = 'none';
+    initDashboard();
+  } else {
+    pwSubmitBtn.addEventListener('click', tryPassword);
+    pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryPassword(); });
+    pwInput.focus();
+  }
+  // ────────────────────────────────────────────────────────────────────────
+});
+
+// ==========================================================================
+// Dashboard init — runs only after password unlock
+// ==========================================================================
+function initDashboard() {
   // Pre-fill inputs
   el.repoInput.value = state.repo;
   el.tokenInput.value = state.token;
@@ -482,12 +526,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   el.saveSettingsBtn.addEventListener('click', () => {
-    const newRepo = el.repoInput.value.trim();
-    const newToken = el.tokenInput.value.trim();
+    const newRepo     = el.repoInput.value.trim();
+    const newToken    = el.tokenInput.value.trim();
     const newInterval = parseInt(el.pollIntervalInput.value) || 15;
 
-    state.repo = newRepo;
-    state.token = newToken;
+    state.repo         = newRepo;
+    state.token        = newToken;
     state.pollInterval = newInterval;
 
     localStorage.setItem('yt_repo', newRepo);
@@ -498,4 +542,4 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshDashboard();
     startPolling();
   });
-});
+}
