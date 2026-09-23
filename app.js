@@ -6,9 +6,11 @@
 // Default Configuration
 const CONFIG = {
   DEFAULT_REPO: 'Pratheesh2005/YT-Automation',
-  DEFAULT_TOKEN: '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',
+  REPO_CH3: 'Pratheesh2005/YT-Automation-3',
+  DEFAULT_TOKEN: '',
   WORKFLOW_CH1: 'daily_shorts.yml',
   WORKFLOW_CH2: 'daily_shorts_wonderpeak.yml',
+  WORKFLOW_CH3: 'daily_shorts.yml',
   WORKFLOW_HEARTBEAT: 'gemini_keepalive.yml',
   DEFAULT_POLL_INTERVAL: 15
 };
@@ -28,6 +30,7 @@ const state = {
   pollInterval: parseInt(localStorage.getItem('yt_poll_interval') || CONFIG.DEFAULT_POLL_INTERVAL),
   isCh1Running: false,
   isCh2Running: false,
+  isCh3Running: false,
   timerId: null
 };
 
@@ -58,6 +61,16 @@ const el = {
   ch2BtnText: document.getElementById('ch2BtnText'),
   ch2Steps: document.getElementById('ch2Steps'),
 
+  // Channel 3 Elements
+  ch3StatusPill: document.getElementById('ch3StatusPill'),
+  ch3VideoTitle: document.getElementById('ch3VideoTitle'),
+  ch3CreationStatus: document.getElementById('ch3CreationStatus'),
+  ch3PublishDate: document.getElementById('ch3PublishDate'),
+  ch3YtLink: document.getElementById('ch3YtLink'),
+  triggerCh3Btn: document.getElementById('triggerCh3Btn'),
+  ch3BtnText: document.getElementById('ch3BtnText'),
+  ch3Steps: document.getElementById('ch3Steps'),
+
   // Bottom Panel
   runsTableBody: document.getElementById('runsTableBody'),
   runsCount: document.getElementById('runsCount'),
@@ -76,8 +89,9 @@ const el = {
 // ==========================================================================
 // GitHub API Helpers
 // ==========================================================================
-async function githubApi(endpoint, options = {}) {
-  const url = `https://api.github.com/repos/${state.repo}/${endpoint}`;
+async function githubApi(endpoint, options = {}, customRepo = null) {
+  const repo = customRepo || state.repo;
+  const url = `https://api.github.com/repos/${repo}/${endpoint}`;
   const headers = {
     'Accept': 'application/vnd.github+json',
     'X-GitHub-Api-Version': '2022-11-28'
@@ -105,9 +119,9 @@ async function githubApi(endpoint, options = {}) {
 }
 
 // Fetch a file content from repository (decodes base64)
-async function fetchRepoFile(path) {
+async function fetchRepoFile(path, customRepo = null) {
   try {
-    const data = await githubApi(`contents/${path}?ref=main&t=${Date.now()}`);
+    const data = await githubApi(`contents/${path}?ref=main&t=${Date.now()}`, {}, customRepo);
     if (data && data.content) {
       const decoded = atob(data.content.replace(/\s/g, ''));
       return JSON.parse(decoded);
@@ -126,6 +140,7 @@ async function triggerWorkflow(workflowFile, channelNum, btnElement, textElement
     btnElement.disabled = true;
     textElement.innerHTML = `<span class="spinner"></span> Dispatching to GitHub Cloud...`;
 
+    const targetRepo = (channelNum === 3) ? CONFIG.REPO_CH3 : state.repo;
     const payload = { ref: 'main' };
     if (channelNum === 1) {
       payload.inputs = { channel: '1' };
@@ -136,7 +151,7 @@ async function triggerWorkflow(workflowFile, channelNum, btnElement, textElement
     await githubApi(`actions/workflows/${workflowFile}/dispatches`, {
       method: 'POST',
       body: JSON.stringify(payload)
-    });
+    }, targetRepo);
 
     textElement.innerHTML = `✅ Dispatched! Cloud runner starting...`;
     
@@ -148,7 +163,7 @@ async function triggerWorkflow(workflowFile, channelNum, btnElement, textElement
     console.error('Dispatch failed:', err);
     alert(`Failed to trigger workflow: ${err.message}`);
     btnElement.disabled = false;
-    textElement.textContent = channelNum === 1 ? 'Generate Channel 1 (Black Pearl)' : 'Generate Channel 2 (WonderPeak)';
+    textElement.textContent = channelNum === 1 ? 'Generate Channel 1 (Black Pearl)' : (channelNum === 2 ? 'Generate Channel 2 (WonderPeak)' : 'Generate Channel 3 (NeuroByte)');
   }
 }
 
@@ -201,6 +216,29 @@ async function updateChannelCards() {
     el.ch2PublishDate.textContent = `Date: ${item.date || 'Recent'}`;
     el.ch2YtLink.style.display = 'none';
   }
+
+  // 3. Fetch Channel 3 data (Queue & History from REPO_CH3)
+  const qCh3 = await fetchRepoFile('scheduled_queue.json', CONFIG.REPO_CH3);
+  const histCh3 = await fetchRepoFile('topic_history.json', CONFIG.REPO_CH3);
+
+  if (qCh3 && qCh3.length > 0) {
+    const item = qCh3[qCh3.length - 1];
+    el.ch3VideoTitle.textContent = item.title || 'Untitled Video';
+    el.ch3CreationStatus.textContent = 'Status: Video Created & Scheduled';
+    el.ch3PublishDate.textContent = `Release: ${item.scheduled_ist || '07:30 PM IST'}`;
+    if (item.video_id) {
+      el.ch3YtLink.href = `https://youtu.be/${item.video_id}`;
+      el.ch3YtLink.style.display = 'inline-flex';
+    } else {
+      el.ch3YtLink.style.display = 'none';
+    }
+  } else if (histCh3 && histCh3.length > 0) {
+    const item = histCh3[histCh3.length - 1];
+    el.ch3VideoTitle.textContent = typeof item === 'string' ? item : (item.title || 'Tech & AI Short');
+    el.ch3CreationStatus.textContent = 'Status: Video Ready';
+    el.ch3PublishDate.textContent = 'Release: 07:30 PM IST';
+    el.ch3YtLink.style.display = 'none';
+  }
 }
 
 // ==========================================================================
@@ -221,6 +259,17 @@ async function updateWorkflowRuns() {
 
     // Update Channel 2 State
     handleChannelRunState(ch2Run, 2, el.ch2StatusPill, el.triggerCh2Btn, el.ch2BtnText, el.ch2Steps);
+
+    // Fetch and Update Channel 3 State (from REPO_CH3)
+    let ch3Run = null;
+    try {
+      const dataCh3 = await githubApi('actions/runs?per_page=5', {}, CONFIG.REPO_CH3);
+      const runsCh3 = dataCh3.workflow_runs || [];
+      ch3Run = runsCh3.find(r => r.path && r.path.includes(CONFIG.WORKFLOW_CH3));
+    } catch (e) {
+      console.warn('Could not fetch Ch3 runs:', e.message);
+    }
+    handleChannelRunState(ch3Run, 3, el.ch3StatusPill, el.triggerCh3Btn, el.ch3BtnText, el.ch3Steps);
 
     // Update Heartbeat State
     if (hbRun) {
@@ -267,7 +316,7 @@ function handleChannelRunState(run, channelNum, pillElement, btnElement, btnText
     pillElement.textContent = 'Ready';
     pillElement.className = 'status-pill idle';
     btnElement.disabled = false;
-    btnTextElement.textContent = channelNum === 1 ? 'Generate Channel 1 (Black Pearl)' : 'Generate Channel 2 (WonderPeak)';
+    btnTextElement.textContent = channelNum === 1 ? 'Generate Channel 1 (Black Pearl)' : (channelNum === 2 ? 'Generate Channel 2 (WonderPeak)' : 'Generate Channel 3 (NeuroByte)');
     resetSteps(stepElements);
     return;
   }
@@ -284,7 +333,7 @@ function handleChannelRunState(run, channelNum, pillElement, btnElement, btnText
     fetchRunStepDetails(run.id, stepElements);
   } else {
     btnElement.disabled = false;
-    btnTextElement.textContent = channelNum === 1 ? 'Generate Channel 1 (Black Pearl)' : 'Generate Channel 2 (WonderPeak)';
+    btnTextElement.textContent = channelNum === 1 ? 'Generate Channel 1 (Black Pearl)' : (channelNum === 2 ? 'Generate Channel 2 (WonderPeak)' : 'Generate Channel 3 (NeuroByte)');
 
     if (run.conclusion === 'success') {
       pillElement.textContent = 'Completed & Published';
@@ -507,6 +556,12 @@ function initDashboard() {
   el.triggerCh2Btn.addEventListener('click', () => {
     if (confirm('Start Daily Video Generation for Channel 2 (WonderPeak)?')) {
       triggerWorkflow(CONFIG.WORKFLOW_CH2, 2, el.triggerCh2Btn, el.ch2BtnText);
+    }
+  });
+
+  el.triggerCh3Btn.addEventListener('click', () => {
+    if (confirm('Start Daily Video Generation for Channel 3 (NeuroByte)?')) {
+      triggerWorkflow(CONFIG.WORKFLOW_CH3, 3, el.triggerCh3Btn, el.ch3BtnText);
     }
   });
 
