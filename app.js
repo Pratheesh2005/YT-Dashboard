@@ -15,6 +15,29 @@ const CONFIG = {
   DEFAULT_POLL_INTERVAL: 15
 };
 
+function updateAutoTriggerStatus() {
+  const elText = document.getElementById('nextAutoTriggerText');
+  if (!elText) return;
+  const now = new Date();
+  const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const istNow = new Date(utcMs + (5.5 * 3600000));
+  const currentMinutes = istNow.getHours() * 60 + istNow.getMinutes();
+  
+  if (currentMinutes < 950) {
+    const diff = 950 - currentMinutes;
+    elText.textContent = `Channel 1 at 03:50 PM IST (in ${diff}m)`;
+  } else if (currentMinutes < 1040) {
+    const diff = 1040 - currentMinutes;
+    elText.textContent = `Channel 3 at 05:20 PM IST (in ${diff}m)`;
+  } else if (currentMinutes < 1130) {
+    const diff = 1130 - currentMinutes;
+    elText.textContent = `Channel 2 at 06:50 PM IST (in ${diff}m)`;
+  } else {
+    elText.textContent = `Tomorrow 03:50 PM IST (Channel 1)`;
+  }
+}
+setInterval(updateAutoTriggerStatus, 30000);
+
 // Check URL parameters for one-click setup (e.g. ?token=gho_... on mobile/Pages)
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.has('token')) {
@@ -546,6 +569,7 @@ function initDashboard() {
   el.pollIntervalInput.value = state.pollInterval;
 
   // Initial Load
+  updateAutoTriggerStatus();
   refreshDashboard();
   startPolling();
 
